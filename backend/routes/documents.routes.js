@@ -1,11 +1,11 @@
 import { Router } from "express";
-import upload from "../middlewares/upload";
+import upload from "../middlewares/upload.js";
 import {
   uploadDocument,
   getDocuments,
   downloadDocument,
   deleteDocument,
-} from "../controllers/document.controller";
+} from "../controllers/documents.controller.js";
 
 const router = Router();
 
