@@ -6,6 +6,9 @@ import {
   downloadFile,
   type DocumentItem,
 } from "./Api/api";
+import "./App.css";
+
+import { toast, ToastContainer } from "react-toastify";
 
 export default function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -18,7 +21,7 @@ export default function App() {
       const data = await fetchFiles();
       setDocs(data);
     } catch (err) {
-      alert("Failed to load documents");
+      toast.error("❌ Failed to load documents");
     } finally {
       setLoading(false);
     }
@@ -29,97 +32,88 @@ export default function App() {
   }, []);
 
   const handleUpload = async () => {
-    if (!file) return alert("Choose a file first!");
-    if (file.type !== "application/pdf") return alert("Only PDFs allowed!");
+    if (!file) return toast.warning("⚠️ Choose a file first!");
+    if (file.type !== "application/pdf")
+      return toast.error("❌ Only PDFs allowed!");
 
     try {
       await uploadFile(file);
       setFile(null);
+      toast.success("📄 Upload successful!");
       loadDocuments();
     } catch (err) {
-      alert("Upload failed");
+      toast.error("❌ Upload failed!");
     }
   };
 
   return (
-    <div
-      style={{
-        padding: 30,
-        maxWidth: 700,
-        margin: "auto",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h1>📄 Medical Document Portal</h1>
+    <div className="container">
+      <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Upload Box */}
-      <div
-        style={{
-          padding: 20,
-          border: "2px dashed #666",
-          borderRadius: 10,
-          marginBottom: 20,
-        }}
-      >
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-        />
+      <h1 className="title">📄 Medical Document Portal</h1>
 
-        <button
-          onClick={handleUpload}
-          style={{
-            marginLeft: 10,
-            padding: "5px 15px",
-            cursor: "pointer",
-          }}
-        >
-          Upload
-        </button>
-      </div>
+      <div className="layout">
+        {/* Upload Panel */}
+        <div className="upload-box">
+          <h2>Upload Document</h2>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+          <button onClick={handleUpload} className="upload-btn">
+            Upload
+          </button>
+        </div>
 
-      {/* Loading */}
-      {loading && <p>Loading documents...</p>}
+        {/* Document List */}
+        <div className="doc-list-box">
+          <h2>Your Documents</h2>
 
-      {/* Document List */}
-      <h2>Your Documents</h2>
-      {docs.length === 0 && !loading && <p>No documents uploaded yet.</p>}
+          {loading && <p>Loading documents...</p>}
+          {!loading && docs.length === 0 && <p>No documents uploaded yet.</p>}
 
-      {docs.map((doc) => (
-        <div
-          key={doc.id}
-          style={{
-            padding: 10,
-            border: "1px solid #ddd",
-            marginBottom: 10,
-            borderRadius: 8,
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <strong>{doc.filename}</strong>
-            <br />
-            <small>Size: {(doc.filesize / 1024).toFixed(1)} KB</small>
-            <br />
-            <small>Uploaded: {new Date(doc.created_at).toLocaleString()}</small>
-          </div>
+          <div className="doc-list">
+            {docs.map((doc) => (
+              <div key={doc.id} className="doc-item">
+                <div>
+                  <strong>{doc.filename}</strong>
+                  <br />
+                  <small>{(doc.filesize / 1024).toFixed(1)} KB</small>
+                  <br />
+                  <small>{new Date(doc.created_at).toLocaleString()}</small>
+                </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => downloadFile(doc.id)}>Download</button>
-            <button
-              style={{ background: "red", color: "white" }}
-              onClick={async () => {
-                await deleteFile(doc.id);
-                loadDocuments();
-              }}
-            >
-              Delete
-            </button>
+                <div className="doc-actions">
+                  <button
+                    onClick={() => {
+                      downloadFile(doc.id);
+                      toast.info("⬇️ Download started...");
+                    }}
+                  >
+                    Download
+                  </button>
+
+                  <button
+                    className="delete-btn"
+                    onClick={async () => {
+                      try {
+                        await deleteFile(doc.id);
+                        toast.success("🗑️ Deleted successfully");
+                        loadDocuments();
+                      } catch (err) {
+                        toast.error("❌ Delete failed");
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 }
