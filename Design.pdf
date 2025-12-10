@@ -36,18 +36,58 @@ When the user wants to view, download, or delete a file, the backend interacts w
 It’s a clean, easy-to-understand architecture designed for local use.
 
 3. API Specification
-
+1. Upload a PDF
+URL: POST /documents/upload
+Description: Uploads a PDF file to the server.
+Sample Request:
 POST /documents/upload
-Used to upload a PDF file.
-
+Content-Type: multipart/form-data
+file:
+Sample Response:
+{
+"success": true,
+"data": {
+"id": 1,
+"filename": "170123123-report.pdf",
+"filepath": "uploads/170123123-report.pdf",
+"filesize": 20480,
+"created_at": "2025-01-01T10:20:30.000Z"
+}
+}
+2. List All Documents
+URL: GET /documents
+Description: Returns all uploaded documents.
+Sample Request:
 GET /documents
-Returns a list of all uploaded documents.
-
-GET /documents/:id
-Downloads the file associated with that ID.
-
-DELETE /documents/:id
-Removes the file from disk and deletes its metadata from the database.
+Sample Response:
+{
+"success": true,
+"data": [
+{
+"id": 1,
+"filename": "report.pdf",
+"filepath": "uploads/report.pdf",
+"filesize": 20480,
+"created_at": "2025-01-01T10:20:30.000Z"
+}
+]
+}
+3. Download a File
+URL: GET /documents/:id
+Description: Downloads a specific PDF by ID.
+Sample Request:
+GET /documents/1
+Response: Binary PDF file returned.
+4. Delete a File
+URL: DELETE /documents/:id
+Description: Deletes a specific PDF and its metadata.
+Sample Request:
+DELETE /documents/1
+Sample Response:
+{
+"success": true,
+"message": "Deleted successfully"
+}
 
 4. Data Flow
 When uploading a file

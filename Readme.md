@@ -33,7 +33,7 @@ on the backend.
 - SQLite  
 
 ---
-
+```
 ## 📁 Project Folder Structure
 
 project/
@@ -55,6 +55,7 @@ project/
 │
 ├── design.md # Architecture & assignment answers
 └── README.md # Project documentation
+```
 
 
 
