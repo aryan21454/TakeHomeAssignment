@@ -68,9 +68,6 @@ cd backend
 npm install
 npm start
 
-yaml
-Copy code
-
 Backend runs on:
 
 👉 http://localhost:4000
