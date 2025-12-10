@@ -1,0 +1,71 @@
+1. Tech Stack Choices
+Q1: Why I chose React + TypeScript + Vite for the frontend
+
+I went with React because it’s the most widely adopted frontend library today and makes it really easy to build interfaces using reusable components. Adding TypeScript gives type safety, which helps catch mistakes early and keeps the codebase cleaner as it grows.
+I used Vite instead of older tools like CRA because it provides an extremely fast development experience and instant hot reload, which makes the workflow smoother. It also has great support for TypeScript, so everything works out of the box.
+Together, React + TS + Vite give a fast, reliable, and maintainable frontend setup.
+
+Q2: Why I chose Express (Node.js) for the backend
+Express is lightweight and very straightforward for building REST APIs. Since the whole system is fairly small, a simple framework like Express is more than enough. It also plays really well with Multer, which makes file uploads easy to manage.
+Another advantage is that both the frontend and backend use JavaScript, so I don’t have to switch languages while developing. The folder structure (routes → controllers → services → models) also stays clean and scalable.
+
+Q3: Why I chose SQLite for the database
+
+SQLite is perfect for a local development project like this. It doesn’t require starting a separate DB server — the entire database is just one file. It’s simple, fast, and ideal for storing small amounts of metadata such as filenames, sizes, and timestamps.
+For a single-user system, or even a few users, SQLite performs very well and keeps the setup minimal.
+
+Q4: How I would scale this system to support ~1,000 users
+
+If this system had to support real traffic or many simultaneous users, I’d make a few upgrades:
+Migrate SQLite → PostgreSQL for better concurrency and durability
+Move file storage from local disk → AWS S3 or similar
+Add proper authentication and role-based access
+Use Redis for caching frequently accessed data
+Deploy the backend behind a load balancer to scale horizontally
+Serve downloads through a CDN for faster access
+Add input validation and rate limiting to improve security
+These changes would make the system production-ready and scalable.
+
+2. Architecture Overview
+
+The app has a simple but clear flow:
+The frontend (React) sends requests to the Express backend.
+The backend saves uploaded PDFs in a local uploads/ folder.
+It also stores file metadata (filename, size, timestamp, path) inside the SQLite database.
+When the user wants to view, download, or delete a file, the backend interacts with both the DB and the uploads folder to perform the operation.
+It’s a clean, easy-to-understand architecture designed for local use.
+
+3. API Specification
+
+POST /documents/upload
+Used to upload a PDF file.
+
+GET /documents
+Returns a list of all uploaded documents.
+
+GET /documents/:id
+Downloads the file associated with that ID.
+
+DELETE /documents/:id
+Removes the file from disk and deletes its metadata from the database.
+
+4. Data Flow
+When uploading a file
+The user selects a PDF from their device.
+The frontend sends it to the backend through a POST request.
+Multer stores the file in the uploads/ folder.
+The backend saves the metadata to SQLite.
+The updated document list is shown to the user.
+When downloading a file
+The user clicks the download button.
+The frontend calls the /documents/:id endpoint.
+The backend retrieves the file’s location from the DB.
+It streams the file back to the user for download.
+
+5. Assumptions
+
+The assignment assumes a single user, so no authentication is included.
+Only PDF files are expected to be uploaded.
+SQLite is sufficient since the system is small.
+The uploads/ folder always exists or is created automatically.
+High concurrency isn’t a concern for this project.
